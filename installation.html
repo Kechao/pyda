@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting pyda running &mdash; pyda 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyda 1.0 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to pyda’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><img src="static/logo.png" border="0" alt="py4sci"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyda’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Getting pyda running</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#install-from-source">Install from source</a></li>
+<li><a class="reference internal" href="#run-an-example">Run an example</a></li>
+<li><a class="reference internal" href="#explanation-of-example">Explanation of example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to pyda&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/installation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="getting-pyda-running">
+<span id="installation"></span><h1>Getting pyda running<a class="headerlink" href="#getting-pyda-running" title="Permalink to this headline">¶</a></h1>
+<p>pyda is very easy to install!</p>
+<p>pyda is hosted on <a class="reference external" href="http://github.com/hickmank/pyda">github</a> and
+<a class="reference external" href="http://pypi.python.org/pypi/pyda">pypi</a>.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>You should already have python 2.7, or something compatible, along
+with <a class="reference external" href="http://www.numpy.org">numpy</a> and <a class="reference external" href="http://matplotlib.org">matplotlib</a>.</p>
+</div>
+<div class="section" id="install-from-source">
+<h2>Install from source<a class="headerlink" href="#install-from-source" title="Permalink to this headline">¶</a></h2>
+<p>Download the files from github to a directory of your
+choice. Alternatively grab the tar.gz from pypi and unpack it. Then,
+from the directory containing pyda&#8217;s <tt class="docutils literal"><span class="pre">setup.py</span></tt>, run:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; python setup.py install
+</pre></div>
+</div>
+<p>Now you can use:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pyda</span>
+</pre></div>
+</div>
+<p>in your python scripts!</p>
+</div>
+<div class="section" id="run-an-example">
+<h2>Run an example<a class="headerlink" href="#run-an-example" title="Permalink to this headline">¶</a></h2>
+<p>The first exampe included with the package performs data assimilation
+using an ensemble Kalman filter (enKF) strategy for an ordinary
+differential equation S-I-R epidemic model. This can be run by changing to the <tt class="docutils literal"><span class="pre">./examples</span></tt> directory and executing:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; python SIR_enkf2horizon.py
+</pre></div>
+</div>
+<p>This should fill the directory with a bunch of files
+(<tt class="docutils literal"><span class="pre">./ensemble.*.dat</span></tt>, <tt class="docutils literal"><span class="pre">analysis.*.dat</span></tt>, and <tt class="docutils literal"><span class="pre">param.*.dat</span></tt>) from
+the data assimilation process. A visualization of these can be seen by
+running:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; python plotSIR_enkf.py
+</pre></div>
+</div>
+<p>This should produce</p>
+<a class="reference internal image-reference" href="_images/SIR_enkf2horizon.png" id="forecast-ex1"><img alt="_images/SIR_enkf2horizon.png" id="forecast-ex1" src="_images/SIR_enkf2horizon.png" style="width: 611.0px; height: 423.0px;" /></a>
+<p>You can change which part of the data assimilation process you plot by
+editing the file numbers in the following lines of
+<tt class="docutils literal"><span class="pre">plotSIR_enkf.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Filename of Ensemble to plot</span>
+<span class="n">EnsembleFileName</span> <span class="o">=</span> <span class="s">&quot;./ensemble.2.dat&quot;</span>
+<span class="c"># Filename of Analysis Ensemble to plot</span>
+<span class="n">AnalysisFileName</span> <span class="o">=</span> <span class="s">&quot;./analysis.2.dat&quot;</span>
+</pre></div>
+</div>
+<p>You can see a different view by changing the line:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">DA_vis</span><span class="o">.</span><span class="n">ode_DA_vis2</span><span class="p">(</span><span class="n">SimDim</span><span class="p">,</span><span class="n">DataFileName</span><span class="p">,</span><span class="n">EnsembleFileName</span><span class="p">,</span><span class="n">AnalysisFileName</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>to:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">DA_vis</span><span class="o">.</span><span class="n">ode_DA_vis1</span><span class="p">(</span><span class="n">SimDim</span><span class="p">,</span><span class="n">DataFileName</span><span class="p">,</span><span class="n">EnsembleFileName</span><span class="p">,</span><span class="n">AnalysisFileName</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>in <tt class="docutils literal"><span class="pre">plotSIR_enkf.py</span></tt>.</p>
+<p>If you desire more details/control over plotting the place to start
+looking is the file <tt class="docutils literal"><span class="pre">AssimilationVis.py</span></tt> in the
+<tt class="docutils literal"><span class="pre">./pyda/utilities/</span></tt> directory.</p>
+</div>
+<div class="section" id="explanation-of-example">
+<h2>Explanation of example<a class="headerlink" href="#explanation-of-example" title="Permalink to this headline">¶</a></h2>
+<p>To interpret the output a little explanation is in order.</p>
+<p>The simulation is a Runge-Kutta solve on the SIR epidemic system</p>
+<div class="math">
+\[\begin{split}\begin{aligned}
+\frac{dS}{dt} &amp;= - \beta I S, \frac{dI}{dt} = \beta I S - \gamma I,
+\frac{dR}{dt} = \gamma I \\
+S(0) &amp;= S_0, I(0) = I_0, R(0) = 1 - S_0 - I_0.
+\end{aligned}\end{split}\]</div>
+<p>Data is generated from this simulation for a set
+<span class="math">\((S_0^*,I_0^*,\beta^*, \gamma^*)\)</span>. This simulation is sampled
+intermittently and Gaussian noise is added to the samples.</p>
+<p>An ensemble of SIR solutions is then generated by taking many samples
+of initialiations/parametrizations around <span class="math">\((S_0^*,I_0^*,\beta^*,
+\gamma^*)\)</span> and running the simulation up until the next data
+point. The data point is then used in an enKF to generate the adjusted
+analysis ensemble. After that the simulation resumes. After each step
+the ensemble and analysis is propagated to an arbitrary time horizon
+to make a forecast. This is what is shown in the <a class="reference internal" href="#forecast-ex1"><em>figure</em></a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyda’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Kyle Hickmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>
