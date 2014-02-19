@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyda.ensemble_generator.ensemble_generator_class &mdash; pyda 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyda 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../../index.html"><img src="../../../_static/logo.png" border="0" alt="py4sci"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyda.ensemble_generator.ensemble_generator_class</h1><div class="highlight"><pre>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c">#   Copyright 2014 Kyle S. Hickmann and</span>
+<span class="c">#                  The Administrators of the Tulane Educational Fund</span>
+<span class="c">#</span>
+<span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c">#   you may not use this file except in compliance with the License.</span>
+<span class="c">#   You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#       http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c">#   See the License for the specific language governing permissions and</span>
+<span class="c">#   limitations under the License.</span>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="EnsembleGeneratorClass"><a class="viewcode-back" href="../../../documentation.html#pyda.ensemble_generator.ensemble_generator_class.EnsembleGeneratorClass">[docs]</a><span class="k">class</span> <span class="nc">EnsembleGeneratorClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c"># This serves as a template for the user of pyda to implement</span>
+    <span class="c"># their own ensemble generation. It usually calls some simulation</span>
+    <span class="c"># routine provided by the user. The initial conditions and</span>
+    <span class="c"># parameters used in the ensemble generation are contained in one</span>
+    <span class="c"># array. Hence the initialization conditions are treated as</span>
+    <span class="c"># parameters.</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># Initialization just defines the object and this will be used</span>
+        <span class="c"># by the data assimilation function in the</span>
+        <span class="c"># DataAssimilationClass.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Name</span> <span class="o">=</span> <span class="s">&#39;Ensemble Name&#39;</span>
+
+    <span class="c"># Returns the ensemble array propagated forward from the</span>
+    <span class="c"># initialization and parametrization in Param. </span>
+    <span class="c"># EnsArray = (Ntimestep*SimulationDimension)x(EnSize) numpy array    </span>
+    <span class="k">def</span> <span class="nf">fwd_propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Param</span><span class="p">,</span><span class="n">start_time</span><span class="p">,</span><span class="n">stop_time</span><span class="p">,</span><span class="n">Ntimestep</span><span class="p">):</span>
+        <span class="c"># For an example implementation look at</span>
+        <span class="c"># SIRensemble.py.</span>
+
+        <span class="c"># Initialization includes the parameter array, start time, stop time, and the number of timesteps</span>
+        <span class="c"># Param = (param size + initialization size)x(Ensemble Size) numpy array</span>
+        <span class="c"># start_time, stop_time = float</span>
+        <span class="c"># Ntimestep = integer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Param</span> <span class="o">=</span> <span class="n">Param</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">start_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_time</span> <span class="o">=</span> <span class="n">stop_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ntimestep</span> <span class="o">=</span> <span class="n">Ntimestep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EnSize</span> <span class="o">=</span> <span class="n">Param</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EnsTime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start_time</span><span class="p">,</span><span class="n">stop_time</span><span class="p">,</span><span class="n">Ntimestep</span><span class="p">)</span>
+
+        <span class="c"># Usually a function is to be called a number of times equal</span>
+        <span class="c"># to self.EnSize corresponding to the different</span>
+        <span class="c"># initializations/parametrizations in self.ParamArray. The</span>
+        <span class="c"># simulation is then run from self.start_time to</span>
+        <span class="c"># self.stop_time for a number of timesteps equal to</span>
+        <span class="c"># self.Ntimestep. Regardless of the shape of the array</span>
+        <span class="c"># returned by the simulation each simulation output is turned</span>
+        <span class="c"># into a column vector of succesive time points and inserted</span>
+        <span class="c"># into a column of EnsArray. This is then attached to the</span>
+        <span class="c"># EnsembleGeneratorClass object using self.EnsArray =</span>
+        <span class="c"># EnsArray.</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Kyle Hickmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

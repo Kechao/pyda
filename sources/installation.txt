@@ -77,8 +77,8 @@ If you desire more details/control over plotting the place to start
 looking is the file ``AssimilationVis.py`` in the
 ``./pyda/utilities/`` directory.
 
-Explanation of example
-----------------------
+Brief explanation of example
+----------------------------
 
 To interpret the output a little explanation is in order. 
 

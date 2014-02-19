@@ -1,0 +1,76 @@
+.. _documentation-index:
+
+****************************
+Modules, Classes & Functions
+****************************
+
+Analysis
+========
+
+:ref:`pyda.analysis_generator<analysis-generator-class>`
+
+Analysis Methods
+----------------
+
+:ref:`pyda.analysis_generator.kf<kalman-filters>`
+
+:ref:`pyda.analysis_generator.kf.enkf1<enkf>`
+
+:ref:`pyda.analysis_generator.kf.enkf1_inflation<enkf>`
+
+:ref:`pyda.analysis_generator.pf<particle-filters>`
+
+:ref:`pyda.analysis_generator.pf.pf_naive<pf-naive>`
+
+Assimilation Class Template
+---------------------------
+
+:ref:`pyda.assimilation.data_assimilation_class<assimilation-class>`
+
+Assimilation Schemes
+====================
+
+:ref:`pyda.assimilation.assimilation_current<assimilation-current>`
+
+:ref:`pyda.assimilation.assimilation_current2horizon<assimilation-current2horizon>`
+
+:ref:`pyda.assimilation.assimilation_smoother<assimilation-smoother>`
+
+Ensemble Generator Class Template
+---------------------------------
+
+:ref:`pyda.ensemble_generator_class<ensemble-class>`
+
+Ensemble Methods
+================
+
+:ref:`pyda.ensemble_generator_class.SIRensemble<ensemble-SIR>`
+
+Utilities
+---------
+
+Epidemic Models
+===============
+
+:ref:`pyda.utilities.epiODElib.rk4<util-rk4>`
+
+:ref:`pyda.utilities.epiODElib.trans_rate<util-trans>`
+
+:ref:`pyda.utilities.epiODElib.SIRode<util-SIR>`
+
+:ref:`pyda.utilities.epiODElib.SIRmod1ode<util-SIRmod1ode>`
+
+:ref:`pyda.utilities.epiODElib.SIRmod2ode<util-SIRmod2ode>`
+
+:ref:`pyda.utilities.epiODElib.SEIRode<util-SEIRode>`
+
+:ref:`pyda.utilities.epiODElib.SEIRplusode<util-SEIRplusode>`
+
+Assimilation Visualization
+==========================
+
+:ref:`pyda.utilities.AssimilationVis<visualization>`
+
+:ref:`pyda.utilities.AssimilationVis.ode_DA_vis1<vis1>`
+
+:ref:`pyda.utilities.AssimilationVis.ode_DA_vis2<vis2>`

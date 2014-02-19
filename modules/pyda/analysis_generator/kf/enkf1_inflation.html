@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyda.analysis_generator.kf.enkf1_inflation &mdash; pyda 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyda 1.0 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../../../index.html"><img src="../../../../_static/logo.png" border="0" alt="py4sci"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyda.analysis_generator.kf.enkf1_inflation</h1><div class="highlight"><pre>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c">#   Copyright 2014 Kyle S. Hickmann and</span>
+<span class="c">#                  The Administrators of the Tulane Educational Fund</span>
+<span class="c">#</span>
+<span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c">#   you may not use this file except in compliance with the License.</span>
+<span class="c">#   You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#       http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c">#   See the License for the specific language governing permissions and</span>
+<span class="c">#   limitations under the License.</span>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="c"># Import AnalysisGeneratorClass</span>
+<span class="kn">from</span> <span class="nn">..analysis_generator_class</span> <span class="kn">import</span> <span class="n">AnalysisGeneratorClass</span>
+
+<div class="viewcode-block" id="ENKF1_inflation"><a class="viewcode-back" href="../../../../documentation.html#pyda.analysis_generator.kf.enkf1_inflation.ENKF1_inflation">[docs]</a><span class="k">class</span> <span class="nc">ENKF1_inflation</span><span class="p">(</span><span class="n">AnalysisGeneratorClass</span><span class="p">):</span>
+    <span class="c"># This is an implementation of a stochastic ensemble Kalman filter</span>
+    <span class="c"># with covariance inflation. Each ensemble member is updated</span>
+    <span class="c"># separately and the full ensemble covariance is never formed.</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">rho</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="c"># INPUT: {numpy arrays}</span>
+        <span class="c">#      &lt;Data Array&gt; = (measurement size)x(ensemble size)</span>
+        <span class="c">#      &lt;Data Covariance&gt; = (measurement size)x(measurement size)</span>
+        <span class="c">#      &lt;Ensemble Array&gt; = (simulation size)x(ensemble size)</span>
+        <span class="c">#      &lt;Parameter Array&gt; = (parameter size)x(ensemble size)</span>
+        <span class="c">#      &lt;Ensemble Observation Array&gt; = (measurement size)x(ensemble size)</span>
+        <span class="c">#      &lt;rho&gt; = (scalar) covariance inflation parameter. Usually rho &gt;= 1.</span>
+        <span class="c"># RETURN: {numpy arrays}</span>
+        <span class="c">#      &lt;Analysis Array&gt; = (simulation size)x(ensemble size)</span>
+        <span class="c">#      &lt;Analysis Parameter Array&gt; = (ensemble size)x(parameter size)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Name</span> <span class="o">=</span> <span class="s">&#39;Stochastic Ensemble Kalman Filter with Covariance Inflation&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rho</span> <span class="o">=</span> <span class="n">rho</span>
+
+    <span class="c"># Returns the analysis ensemble array and the analysis parameter array.</span>
+    <span class="c"># Analysis = (Ntimestep*SimulationDimension)x(EnSize) numpy array</span>
+    <span class="c"># AnalysisParam = (Parameter Size + Initialization Size)x(EnSize) numpy array</span>
+    <span class="k">def</span> <span class="nf">create_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Data</span><span class="p">,</span><span class="n">DataCov</span><span class="p">,</span><span class="n">Param</span><span class="p">,</span><span class="n">Ensemble</span><span class="p">,</span><span class="n">Observation</span><span class="p">):</span>
+        <span class="c"># Collect data sizes.</span>
+        <span class="n">EnSize</span> <span class="o">=</span> <span class="n">Ensemble</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">SimSize</span> <span class="o">=</span> <span class="n">Ensemble</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> 
+        <span class="n">MeaSize</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c"># First combine the Ensemble and Param arrays.</span>
+        <span class="c"># A is (SimSize+ParSize)x(EnSize)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">Ensemble</span><span class="p">,</span> <span class="n">Param</span><span class="o">.</span><span class="n">transpose</span><span class="p">()])</span>
+
+        <span class="c"># Calculate ensemble mean</span>
+        <span class="n">Amean</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">EnSize</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">EnSize</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+        <span class="c"># Calculate ensemble observation mean</span>
+        <span class="n">MeasAvg</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">EnSize</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">Observation</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">MeaSize</span><span class="p">,</span><span class="n">EnSize</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">EnSize</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+        
+        <span class="c"># Inflate the ensemble </span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">Amean</span><span class="p">)</span> <span class="o">+</span> <span class="n">Amean</span>
+
+        <span class="c"># Inflate the ensemble observations</span>
+        <span class="n">Observation</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">Observation</span> <span class="o">-</span> <span class="n">MeasAvg</span><span class="p">)</span> <span class="o">+</span> <span class="n">MeasAvg</span>
+
+        <span class="c"># Calculate ensemble perturbation from mean</span>
+        <span class="c"># Apert should be (SimSize+ParSize)x(EnSize)</span>
+        <span class="n">dA</span> <span class="o">=</span> <span class="n">A</span> <span class="o">-</span> <span class="n">Amean</span>
+
+        <span class="c"># Data perturbation from ensemble measurements</span>
+        <span class="c"># dD should be (MeasSize)x(EnSize)</span>
+        <span class="n">dD</span> <span class="o">=</span> <span class="n">Data</span> <span class="o">-</span> <span class="n">Observation</span>
+
+        <span class="c"># Ensemble measurement perturbation from ensemble measurement mean.</span>
+        <span class="c"># S is (MeasSize)x(EnSize)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">Observation</span> <span class="o">-</span> <span class="n">MeasAvg</span>
+
+        <span class="c"># Set up measurement covariance matrix</span>
+        <span class="c"># COV is (MeasSize)x(MeasSize)</span>
+        <span class="n">COV</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">EnSize</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="n">S</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span> <span class="o">+</span> <span class="n">DataCov</span>
+    
+        <span class="c"># Compute inv(COV)*dD</span>
+        <span class="c"># Should be (MeasSize)x(EnSize)</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">COV</span><span class="p">,</span><span class="n">dD</span><span class="p">)</span>
+
+        <span class="c"># Adjust ensemble perturbations</span>
+        <span class="c"># Should be (SimSize+ParSize)x(MeasSize)</span>
+        <span class="n">dAS</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">EnSize</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dA</span><span class="p">,</span><span class="n">S</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+
+        <span class="c"># Compute analysis</span>
+        <span class="c"># Analysis is (SimSize+ParSize)x(EnSize)</span>
+        <span class="n">Analysis</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dAS</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
+
+        <span class="c"># Separate and return Analyzed Ensemble and Analyzed Parameters.</span>
+        <span class="n">AnalysisParam</span> <span class="o">=</span> <span class="n">Analysis</span><span class="p">[</span><span class="n">SimSize</span><span class="p">:,:]</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+        <span class="n">Analysis</span> <span class="o">=</span> <span class="n">Analysis</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">SimSize</span><span class="p">,:]</span>
+                
+        <span class="k">return</span> <span class="p">[</span><span class="n">Analysis</span><span class="p">,</span><span class="n">AnalysisParam</span><span class="p">]</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Kyle Hickmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

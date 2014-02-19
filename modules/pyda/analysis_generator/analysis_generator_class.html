@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyda.analysis_generator.analysis_generator_class &mdash; pyda 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyda 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../../index.html"><img src="../../../_static/logo.png" border="0" alt="py4sci"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyda.analysis_generator.analysis_generator_class</h1><div class="highlight"><pre>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c">#   Copyright 2014 Kyle S. Hickmann and</span>
+<span class="c">#                  The Administrators of the Tulane Educational Fund</span>
+<span class="c">#</span>
+<span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c">#   you may not use this file except in compliance with the License.</span>
+<span class="c">#   You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#       http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c">#   See the License for the specific language governing permissions and</span>
+<span class="c">#   limitations under the License.</span>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="AnalysisGeneratorClass"><a class="viewcode-back" href="../../../documentation.html#pyda.analysis_generator.analysis_generator_class.AnalysisGeneratorClass">[docs]</a><span class="k">class</span> <span class="nc">AnalysisGeneratorClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c"># This serves as a template for the user of pyda to implement</span>
+    <span class="c"># their own analysis generation. The initial conditions and</span>
+    <span class="c"># parameters used in the ensemble are contained passed to the</span>
+    <span class="c"># analysis scheme in one array. Hence the initialization</span>
+    <span class="c"># conditions are treated as parameters. </span>
+
+    <span class="c"># When the analysis is used it must MINIMALLY be passed</span>
+    <span class="c"># information about: </span>
+    <span class="c">#                  - ensemble array</span>
+    <span class="c">#                  - ensemble observation</span>
+    <span class="c">#                  - data array</span>
+    <span class="c">#                  - data covariance</span>
+    <span class="c">#                  - parameter/initialization array</span>
+
+    <span class="c"># INPUT: {numpy arrays}</span>
+    <span class="c">#      &lt;Data Array&gt; = (measurement size)x(ensemble size)</span>
+    <span class="c">#      &lt;Data Covariance&gt; = (measurement size)x(measurement size)</span>
+    <span class="c">#      &lt;Ensemble Array&gt; = (simulation size)x(ensemble size)</span>
+    <span class="c">#      &lt;Parameter Array&gt; = (parameter size)x(ensemble size)</span>
+    <span class="c">#      &lt;Ensemble Observation Array&gt; = (measurement size)x(ensemble size)</span>
+    <span class="c">#</span>
+    <span class="c"># RETURN: {numpy arrays}</span>
+    <span class="c">#      &lt;Analysis Array&gt; = (simulation size)x(ensemble size)</span>
+    <span class="c">#      &lt;Analysis Parameter Array&gt; = (parameter size)x(ensemble size)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Name</span> <span class="o">=</span> <span class="s">&#39;Analysis Scheme Name&#39;</span>
+
+    <span class="c"># Returns the analysis ensemble array and the analysis parameter array.</span>
+    <span class="c"># AnsArray = (Ntimestep*SimulationDimension)x(EnSize) numpy array</span>
+    <span class="c"># AnsParamArray = (Parameter Size + Initialization Size)x(EnSize) numpy array</span>
+    <span class="k">def</span> <span class="nf">create_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Data</span><span class="p">,</span><span class="n">DataCov</span><span class="p">,</span><span class="n">ParamArray</span><span class="p">,</span><span class="n">EnsArray</span><span class="p">,</span><span class="n">ObsArray</span><span class="p">):</span>
+        <span class="c"># For an example implementation look at</span>
+        <span class="c"># enkf*.py.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ParamArray</span> <span class="o">=</span> <span class="n">ParamArray</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EnSize</span> <span class="o">=</span> <span class="n">ParamArray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Data</span> <span class="o">=</span> <span class="n">Data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DataCov</span> <span class="o">=</span> <span class="n">DataCov</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ObsArray</span> <span class="o">=</span> <span class="n">ObsArray</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EnsArray</span>
+        
+        <span class="c"># return [AnsArray,AnsParamArray]</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Kyle Hickmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

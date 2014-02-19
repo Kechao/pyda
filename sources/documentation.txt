@@ -1,0 +1,190 @@
+.. _analysis-generator-class:
+
+Analysis Generator Template Class
+---------------------------------
+
+All analysis generation methods in pyda are derived from this class. 
+
+.. currentmodule:: pyda.analysis_generator.analysis_generator_class
+
+.. autoclass:: AnalysisGeneratorClass
+
+.. _kalman-filters:
+
+Kalman Filters
+==============
+
+Different flavors of ensemble Kalman filters are available.
+
+.. _enkf:
+
+.. currentmodule:: pyda.analysis_generator.kf.enkf1
+
+.. autoclass:: ENKF1
+
+.. _enkf-inflation:
+
+.. currentmodule:: pyda.analysis_generator.kf.enkf1_inflation
+
+.. autoclass:: ENKF1_inflation
+
+.. _particle-filters:
+
+Particle Filters
+================
+
+Different flavors of particle filters, sequential Monte Carlo filters, are available.
+
+.. _pf-naive:
+
+.. currentmodule:: pyda.analysis_generator.pf.pf_naive
+
+.. autoclass:: PF_NAIVE
+
+.. _assimilation-class:
+
+Data Assimilation Template Class
+--------------------------------
+
+Data assimilation classes handle the interaction of ensemble
+generation and analysis generation. All data assimilation classes are
+derived from this class.
+
+.. currentmodule:: pyda.assimilation.data_assimilation_class
+
+.. autoclass:: DataAssimilationClass
+
+Data Assimilation Schemes
+=========================
+
+pyda includes some preprogrammed data assimilation classes that inherit from ``DataAssimilationClass``
+
+.. _assimilation-current:
+
+.. currentmodule:: pyda.assimilation.assimilation_current
+
+.. autoclass:: DA_current
+
+.. _assimilation-current2horizon:
+
+.. currentmodule:: pyda.assimilation.assimilation_current2horizon
+
+.. autoclass:: DA_current2horizon
+
+.. _assimilation-smoother:
+
+.. currentmodule:: pyda.assimilation.assimilation_smoother
+
+.. autoclass:: DA_smoother
+
+.. _ensemble-class:
+
+Ensemble Generator Template Class
+---------------------------------
+
+pyda uses a class to call the simulation for forward propagation. This
+serves as a template to implement your own.
+
+.. currentmodule:: pyda.ensemble_generator.ensemble_generator_class
+
+.. autoclass:: EnsembleGeneratorClass
+
+Ensemble Generation Implementations
+===================================
+
+pyda has one ensemble propagation class built currently. This should
+provide a good example for implementing your own ODE data assimilation
+example. For higher dimensions the data storage will be more
+difficult. Stay tuned!
+
+.. _ensemble-SIR:
+
+.. currentmodule:: pyda.ensemble_generator.SIRensemble
+
+.. autoclass:: SIRensemble
+
+.. _utilities:
+
+Utilities
+---------
+
+.. _epi-models:
+
+Epidemic Models
+===============
+
+We have included a number of ODE epidemic model implementations for
+data assimilation experimentation. It remains to include 2-dimensional
+examples.
+
+All of the ODE models are simulated using a fourth order Runge-Kutta
+scheme which provides an accurate enough solution for experimentation
+with the epidemic models.
+
+The epidemic models call the ``rk4`` function through a model function
+that passes a derivative of the system along with the
+parametrization/initialization. The majority of the model
+specification takes place in the derivative term.
+
+.. _util-rk4:
+
+.. currentmodule:: pyda.utilities.epiODElib
+
+.. autofunction:: rk4
+
+.. _util-trans:
+
+A few of the epi-models use a variable transmission which is
+implemented as a function.
+
+.. autofunction:: trans_rate
+
+Now for the actual models...
+
+.. _util-SIR:
+
+.. autofunction:: SIRode
+
+.. autofunction:: SIR_D
+
+.. _util-SIRmod1ode:
+
+.. autofunction:: SIRmod1ode
+
+.. autofunction:: SIRmod1_D
+
+.. _util-SIRmod2ode:
+
+.. autofunction:: SIRmod2ode
+
+.. autofunction:: SIRmod2_D
+
+.. _util-SEIRode:
+
+.. autofunction:: SEIRode
+
+.. autofunction:: SEIR_D
+
+.. _util-SEIRplusode:
+
+.. autofunction:: SEIRplusode
+
+.. autofunction:: SEIRplus_D
+
+.. _visualization:
+
+Assimilation Visualization
+==========================
+
+We provide two functions so far to visualize the data assimilation
+process for ODE.
+
+.. currentmodule:: pyda.utilities.AssimilationVis
+
+.. _vis1:
+
+.. autofunction:: ode_DA_vis1
+
+.. _vis2:
+
+.. autofunction:: ode_DA_vis2

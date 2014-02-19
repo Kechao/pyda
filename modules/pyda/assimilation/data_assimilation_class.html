@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyda.assimilation.data_assimilation_class &mdash; pyda 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyda 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../../index.html"><img src="../../../_static/logo.png" border="0" alt="py4sci"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyda.assimilation.data_assimilation_class</h1><div class="highlight"><pre>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c">#   Copyright 2014 Kyle S. Hickmann and</span>
+<span class="c">#                  The Administrators of the Tulane Educational Fund</span>
+<span class="c">#</span>
+<span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c">#   you may not use this file except in compliance with the License.</span>
+<span class="c">#   You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#       http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c">#   See the License for the specific language governing permissions and</span>
+<span class="c">#   limitations under the License.</span>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="DataAssimilationClass"><a class="viewcode-back" href="../../../documentation.html#pyda.assimilation.data_assimilation_class.DataAssimilationClass">[docs]</a><span class="k">class</span> <span class="nc">DataAssimilationClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c"># This class is the main machinery of the pyda data assimilation</span>
+    <span class="c"># package. It controls how the parameter/initialization array is</span>
+    <span class="c"># formed and how the data is read. This class also controls how</span>
+    <span class="c"># the data covariance is defined and defines the model-to-data</span>
+    <span class="c"># map. The forecast horizon is defined in this class and the</span>
+    <span class="c"># interaction of the analysis-filter and ensemble generation. It</span>
+    <span class="c"># also controls reading and writing of the parameter, ensemble,</span>
+    <span class="c"># and analysis arrays.</span>
+
+    <span class="c"># The class is initialized by reading in the data to arrays.</span>
+    <span class="c"># Data = (Ndata_pts)x(measurement size) numpy array</span>
+    <span class="c"># DataTime = (Ndata_pts) numpy vector</span>
+    <span class="c"># data_noise = either scalar standard deviation of data error </span>
+    <span class="c">#              or vector of standard deviations in data error </span>
+    <span class="c">#              at each data point</span>
+    <span class="c"># EnSize = Integer specifying size of ensemble</span>
+    <span class="c"># SimDim = Dimension of the simulation at each timestep</span>
+    <span class="c"># Horizon = Time to propagate ensemble forecast until after last data </span>
+    <span class="c">#           point is assimilated</span>
+    <span class="c"># EnsembleClass = object of type EnsembleGeneratorClass(object) that will</span>
+    <span class="c">#                 be called to generate the ensemble</span>
+    <span class="c"># AnalysisClass = object of type AnalysisGeneratorClass(object) that will </span>
+    <span class="c">#                 be called to form the analysis ensemble</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">DataFileName</span><span class="p">,</span><span class="n">data_noise</span><span class="p">,</span><span class="n">Horizon</span><span class="p">,</span><span class="n">EnSize</span><span class="p">,</span><span class="n">SimDim</span><span class="p">,</span><span class="n">EnsembleClass</span><span class="p">,</span><span class="n">AnalysisClass</span><span class="p">):</span>
+        <span class="n">tmpData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">DataFileName</span><span class="p">,</span><span class="n">delimiter</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DataTime</span> <span class="o">=</span> <span class="n">tmpData</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Data</span> <span class="o">=</span> <span class="n">tmpData</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_noise</span> <span class="o">=</span> <span class="n">data_noise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Horizon</span> <span class="o">=</span> <span class="n">Horizon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensemble</span> <span class="o">=</span> <span class="n">EnsembleClass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_analysis</span> <span class="o">=</span> <span class="n">AnalysisClass</span>
+        
+        <span class="c"># Important sizes and dimensions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">EnSize</span> <span class="o">=</span> <span class="n">EnSize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SimDim</span> <span class="o">=</span> <span class="n">SimDim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ObsDim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c"># Initializes the parameter/initialization array.</span>
+    <span class="c"># ParamArray = (param size + initialization size)x(Ensemble Size) numpy array</span>
+    <span class="k">def</span> <span class="nf">param_initialization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># This can either be a routine to generate an initial</span>
+        <span class="c"># parameter/initialization array or it can read a file of</span>
+        <span class="c"># pre-generated parameter/initialization sets. It must then</span>
+        <span class="c"># create the self.Param = Param numpy array that</span>
+        <span class="c"># will be passed to the ensemble generation and analysis</span>
+        <span class="c"># generation classes. </span>
+        
+        <span class="c"># self.Param = </span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="c"># Attribute to write a parameter array to a file. </span>
+    <span class="k">def</span> <span class="nf">param_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ParamFileName</span><span class="p">):</span>
+        <span class="c"># np.savetxt(ParamFileName,self.Param,fmt=&#39;%5.5f&#39;,delimiter=&#39;\t&#39;)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="c"># Attribute to read a parameter array to a file. </span>
+    <span class="k">def</span> <span class="nf">param_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ParamFileName</span><span class="p">):</span>
+        <span class="c"># self.Param = np.loadtxt(ParamFileName,delimiter=&#39;\t&#39;,skiprows=1)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="c"># Defines the array of observations corresponding to a generated ensemble.</span>
+    <span class="c"># Observation = (measurement size)x(Ensemble Size) numpy array</span>
+    <span class="k">def</span> <span class="nf">Model2DataMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Ensemble</span><span class="p">):</span>
+        <span class="c"># Defines the mapping of the simulation to the data. </span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="c"># Attribute to write an ensemble array to a file. This may involve</span>
+    <span class="c"># reshaping the ensemble array depending on the model and how the</span>
+    <span class="c"># file is to be used later. The ensemble time vector is always the</span>
+    <span class="c"># left most column.</span>
+    <span class="k">def</span> <span class="nf">ensemble_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Ensemble</span><span class="p">,</span><span class="n">EnsTime</span><span class="p">,</span><span class="n">EnsFileName</span><span class="p">):</span>
+        <span class="c"># EnsembleWrite is combined numpy array.</span>
+        <span class="c"># np.savetxt(EnsFileName,EnsembleWrite,fmt=&#39;%5.5f&#39;,delimiter=&#39; &#39;)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>       
+
+    <span class="c"># Attribute to define the data-error covariance matrix.</span>
+    <span class="k">def</span> <span class="nf">DataCovInit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># The error covariance in the data must be defined. If the</span>
+        <span class="c"># data being assimilated at each step is just a scalar then</span>
+        <span class="c"># this will just be a scalar. However, if the data being</span>
+        <span class="c"># assimilated at each step is a vector the covariance will be</span>
+        <span class="c"># a square matrix of equal size.</span>
+
+        <span class="c"># This should use self.data_noise</span>
+
+        <span class="c"># self.DataCov = </span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="c"># Attribute that controls how the data, ensemble generation,</span>
+    <span class="c"># analysis, and reading/writing interact.</span>
+    <span class="c"># Ntimestep = number of timesteps per data point in ensemble generation</span>
+    <span class="k">def</span> <span class="nf">DArun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Ntimestep</span><span class="p">,</span><span class="n">InitialTime</span><span class="p">):</span>
+        <span class="c"># Data Assimilation process consists of 3 steps: </span>
+        <span class="c"># 1.) Ensemble generation </span>
+        <span class="c"># 2.) Analysis generation </span>
+        <span class="c"># 3.) Write analysis/ensemble arrays and parameter array </span>
+        <span class="c"># The process is then repeated until the data is exhausted. At this </span>
+        <span class="c"># point a forecast is made until the final Horizon.</span>
+
+        <span class="c"># This will need to be tweeked slightly depending on the exact</span>
+        <span class="c"># way the data is meant to be assimilated at each step and the</span>
+        <span class="c"># nature of the analysis step used.</span>
+        
+        <span class="c"># Initialize start time</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">InitialTime</span>
+
+        <span class="c"># Initialize Parametrization/Initialization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_initialization</span><span class="p">()</span>
+
+        <span class="c"># Initialize Data Covariance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DataCovInit</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="c"># 1.) Ensemble Generation</span>
+            <span class="n">stop_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DataTime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">Ensemble</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ensemble</span><span class="o">.</span><span class="n">fwd_propagate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Param</span><span class="p">,</span><span class="n">start_time</span><span class="p">,</span><span class="n">stop_time</span><span class="p">,</span><span class="n">Ntimestep</span><span class="p">)</span>        
+            <span class="n">Observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Model2DataMap</span><span class="p">(</span><span class="n">Ensemble</span><span class="p">)</span>
+            
+            <span class="c"># Write ensemble array</span>
+            <span class="c"># EnsFileName = </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_write</span><span class="p">(</span><span class="n">Ensemble</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_ensemble</span><span class="o">.</span><span class="n">EnsTime</span><span class="p">,</span><span class="n">EnsFileName</span><span class="p">)</span>            
+
+            <span class="c"># Increment start time</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">stop_time</span>
+            
+            <span class="c"># Define data array used in ensemble analysis</span>
+            <span class="c"># DataArray = (observation size)x(ensemble size) numpy array created by Data[i,:]</span>
+            <span class="c">#        and DataCov</span>
+            <span class="c"># 2.) Analysis generation</span>
+            <span class="p">[</span><span class="n">Analysis</span><span class="p">,</span><span class="n">AnalysisParam</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analysis</span><span class="o">.</span><span class="n">create_analysis</span><span class="p">(</span><span class="n">DataArray</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">DataCov</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">Param</span><span class="p">,</span><span class="n">Ensemble</span><span class="p">,</span><span class="n">Observation</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Param</span> <span class="o">=</span> <span class="n">AnalysisParam</span>
+            <span class="c"># AnsFileName = </span>
+            <span class="c"># ParamFileName = </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param_write</span><span class="p">(</span><span class="n">ParamFileName</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_write</span><span class="p">(</span><span class="n">Analysis</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_ensemble</span><span class="o">.</span><span class="n">EnsTime</span><span class="p">,</span><span class="n">AnsFileName</span><span class="p">)</span>            
+
+        <span class="c"># Forecast to end horizon</span>
+        <span class="c"># Horizon_timesteps = </span>
+        <span class="n">Forecast</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ensemble</span><span class="o">.</span><span class="n">fwd_propagate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Param</span><span class="p">,</span><span class="n">start_time</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">Horizon</span><span class="p">,</span><span class="n">Horizon_timesteps</span><span class="p">)</span>
+        <span class="c"># Write forecast array</span>
+        <span class="c"># ForecastFileName = </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensemble_write</span><span class="p">(</span><span class="n">Forecast</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_ensemble</span><span class="o">.</span><span class="n">EnsTime</span><span class="p">,</span><span class="n">ForecastFileName</span><span class="p">)</span>            
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Kyle Hickmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyda.utilities.epiODElib &mdash; pyda 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyda 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../../index.html"><img src="../../../_static/logo.png" border="0" alt="py4sci"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyda.utilities.epiODElib</h1><div class="highlight"><pre>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c">#   Copyright 2014 Kyle S. Hickmann and</span>
+<span class="c">#                  The Administrators of the Tulane Educational Fund</span>
+<span class="c">#</span>
+<span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c">#   you may not use this file except in compliance with the License.</span>
+<span class="c">#   You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#       http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c">#   See the License for the specific language governing permissions and</span>
+<span class="c">#   limitations under the License.</span>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c"># This library contains a suite of functions to generate simulations </span>
+<span class="c"># of stochastic and deterministic disease progressions with and without </span>
+<span class="c"># noise due to model error. </span>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">math</span> 
+
+<span class="c">###############################################################################</span>
+<span class="c"># Simulate a very basic deterministic SIR system with parameters</span>
+<span class="c"># beta = transmission rate</span>
+<span class="c"># gamma = recovery rate</span>
+<span class="c"># Returns numpy array:</span>
+<span class="c">#    Xsim = (2)x(Ntimestep) first row S(t), second row I(t).</span>
+<div class="viewcode-block" id="SIRode"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SIRode">[docs]</a><span class="k">def</span> <span class="nf">SIRode</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span> 
+    <span class="c"># y0 = 2x1 numpy array of initial conditions.</span>
+    <span class="c"># time = Ntimestep length numpy array</span>
+    <span class="c"># beta = scalar</span>
+    <span class="c"># gamma = scalar</span>
+    
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">rk4</span><span class="p">(</span><span class="n">SIR_D</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span><span class="n">gamma</span><span class="p">,))</span>
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">Xsim</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Xsim</span>
+
+<span class="c"># Derivative for basic SIR system.</span></div>
+<div class="viewcode-block" id="SIR_D"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SIR_D">[docs]</a><span class="k">def</span> <span class="nf">SIR_D</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">gamma</span><span class="p">):</span>
+    <span class="c"># y[0] = susceptible</span>
+    <span class="c"># y[1] = infected</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    
+    <span class="n">dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">gamma</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dy</span>
+
+<span class="c">###############################################################################</span>
+<span class="c"># Simulate a modified deterministic SIR system with parameters built to </span>
+<span class="c"># have a power-law scaling for the contact rate as in,</span>
+<span class="c"># &quot;Semi-empirical power-law scaling of new infection rate to model</span>
+<span class="c">#  epidemic dynamics with inhomogeneous mixing.&quot;</span>
+<span class="c">#  Mathematical Biosciences 203 (2006) 301-318</span>
+<span class="c"># beta = transmission rate</span>
+<span class="c"># gamma = recovery rate</span>
+<span class="c"># nu = contact rate power-law</span>
+<span class="c"># Returns numpy array:</span>
+<span class="c">#    Xsim = (2)x(Ntimestep) first row S(t), second row I(t).</span></div>
+<div class="viewcode-block" id="SIRmod1ode"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SIRmod1ode">[docs]</a><span class="k">def</span> <span class="nf">SIRmod1ode</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">nu</span><span class="p">):</span> 
+    <span class="c"># y0 = 2x1 numpy array of initial conditions.</span>
+    <span class="c"># time = Ntimestep length numpy array</span>
+    <span class="c"># beta = scalar</span>
+    <span class="c"># gamma = scalar</span>
+    <span class="c"># nu = scalar</span>
+    
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">rk4</span><span class="p">(</span><span class="n">SIRmod1_D</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span><span class="n">gamma</span><span class="p">,</span><span class="n">nu</span><span class="p">,))</span>
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">Xsim</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Xsim</span>
+
+<span class="c"># Derivative for SIR system.</span></div>
+<div class="viewcode-block" id="SIRmod1_D"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SIRmod1_D">[docs]</a><span class="k">def</span> <span class="nf">SIRmod1_D</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">gamma</span><span class="p">,</span><span class="n">nu</span><span class="p">):</span>
+    <span class="c"># y[0] = susceptible</span>
+    <span class="c"># y[1] = infected</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    
+    <span class="n">dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">nu</span><span class="p">)</span>
+    <span class="n">dy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">nu</span><span class="p">)</span> <span class="o">-</span> <span class="n">gamma</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dy</span>
+
+<span class="c">###############################################################################</span>
+<span class="c"># Simulate a modified deterministic SIR system with parameters built to </span>
+<span class="c"># have a power-law scaling for the contact rate as in,</span>
+<span class="c"># &quot;Semi-empirical power-law scaling of new infection rate to model</span>
+<span class="c">#  epidemic dynamics with inhomogeneous mixing.&quot;</span>
+<span class="c">#  Mathematical Biosciences 203 (2006) 301-318</span>
+<span class="c"># With this instance we also introduce a time varying transmission rate </span>
+<span class="c"># similar to that used in, &quot;Modeling the spread of influenza among cities&quot;</span>
+<span class="c"># by James M. Hyman and Tara LaForce 2003.</span>
+<span class="c"># beta = transmission rate</span>
+<span class="c"># gamma = recovery rate</span>
+<span class="c"># nu = contact rate power-law</span>
+<span class="c"># alpha = amplitude of transmission rate variation </span>
+<span class="c">#         beta varies over [1-alpha,1+alpha]</span>
+<span class="c"># c = time of peak transmission rate</span>
+<span class="c"># w = width of ramp up and ramp down of transmission</span>
+
+<span class="c"># Returns numpy array:</span>
+<span class="c">#    Xsim = (2)x(Ntimestep) first row S(t), second row I(t).</span></div>
+<div class="viewcode-block" id="SIRmod2ode"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SIRmod2ode">[docs]</a><span class="k">def</span> <span class="nf">SIRmod2ode</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span> 
+    <span class="c"># y0 = 2x1 numpy array of initial conditions.</span>
+    <span class="c"># time = Ntimestep length numpy array</span>
+    <span class="c"># beta = scalar</span>
+    <span class="c"># mu = scalar</span>
+    <span class="c"># nu = scalar</span>
+    
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">rk4</span><span class="p">(</span><span class="n">SIRmod2_D</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span><span class="n">gamma</span><span class="p">,</span><span class="n">nu</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">w</span><span class="p">,))</span>
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">Xsim</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Xsim</span>
+
+<span class="c"># Derivative for SIR system.</span></div>
+<div class="viewcode-block" id="SIRmod2_D"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SIRmod2_D">[docs]</a><span class="k">def</span> <span class="nf">SIRmod2_D</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">gamma</span><span class="p">,</span><span class="n">nu</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">w</span><span class="p">):</span>
+    <span class="c"># y[0] = susceptible</span>
+    <span class="c"># y[1] = infected</span>
+    <span class="c"># t = scalar time point</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    
+    <span class="n">dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">trans_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">w</span><span class="p">))</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">nu</span><span class="p">)</span>
+    <span class="n">dy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">trans_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">w</span><span class="p">))</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">nu</span><span class="p">)</span> <span class="o">-</span> <span class="n">gamma</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dy</span>
+
+<span class="c">###############################################################################</span>
+<span class="c"># Simulate a basic deterministic SEIR system with parameters</span>
+<span class="c"># beta = transmission rate</span>
+<span class="c"># mu = incubation rate</span>
+<span class="c"># gamma = recovery rate</span>
+<span class="c"># Returns numpy array:</span>
+<span class="c">#    Xsim = (3)x(Ntimestep) first row S(t), second row I(t),</span>
+<span class="c">#           third row E(t).</span></div>
+<div class="viewcode-block" id="SEIRode"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SEIRode">[docs]</a><span class="k">def</span> <span class="nf">SEIRode</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span> 
+    <span class="c"># y0 = 3x1 numpy array of initial conditions.</span>
+    <span class="c"># time = Ntimestep length numpy array</span>
+    <span class="c"># beta = scalar</span>
+    <span class="c"># mu = scalar</span>
+    <span class="c"># gamma = scalar</span>
+    
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">rk4</span><span class="p">(</span><span class="n">SEIR_D</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">gamma</span><span class="p">,))</span>
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">Xsim</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Xsim</span>
+
+<span class="c"># Derivative for basic SEIR system.</span></div>
+<div class="viewcode-block" id="SEIR_D"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SEIR_D">[docs]</a><span class="k">def</span> <span class="nf">SEIR_D</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">gamma</span><span class="p">):</span>
+    <span class="c"># y[0] = susceptible</span>
+    <span class="c"># y[1] = exposed</span>
+    <span class="c"># y[2] = infected/infectious</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    
+    <span class="n">dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">dy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">mu</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dy</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mu</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">gamma</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dy</span>
+
+<span class="c">###############################################################################</span>
+<span class="c"># Simulate a deterministic SEIR system with parameters built to </span>
+<span class="c"># have a power-law scaling for the contact rate as in,</span>
+<span class="c"># &quot;Semi-empirical power-law scaling of new infection rate to model</span>
+<span class="c">#  epidemic dynamics with inhomogeneous mixing.&quot;</span>
+<span class="c">#  Mathematical Biosciences 203 (2006) 301-318</span>
+<span class="c"># With this instance we also introduce a time varying transmission rate </span>
+<span class="c"># similar to that used in, &quot;Modeling the spread of influenza among cities&quot;</span>
+<span class="c"># by James M. Hyman and Tara LaForce 2003.</span>
+
+<span class="c"># Returns numpy array:</span>
+<span class="c">#    Xsim = (3)x(Ntimestep) first row S(t), second row I(t),</span>
+<span class="c">#           third row E(t).</span>
+<span class="c"># Variables are (S0,E0,I0,beta,mu,gamma,nu,alpha,c,w)</span>
+<span class="c"># S0 = initial susceptible ratio</span>
+<span class="c"># E0 = initial exposed ratio</span>
+<span class="c"># I0 = initial infected ratio</span>
+<span class="c"># R0 = initial recovered ratio, S0+E0+I0+R0=1</span>
+<span class="c"># beta = base transmission rate (S0-&gt;E0)</span>
+<span class="c"># mu = incubation rate (E0-&gt;I0)</span>
+<span class="c"># gamma = recovery rate (I0-&gt;R0)</span>
+<span class="c"># nu = contact power-law scaling</span>
+<span class="c"># alpha = amplitude of transmission rate variation </span>
+<span class="c">#         beta varies over [1-alpha,1+alpha]</span>
+<span class="c"># c = time of peak transmission rate</span>
+<span class="c"># w = width of ramp up and ramp down of transmission</span></div>
+<div class="viewcode-block" id="SEIRplusode"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SEIRplusode">[docs]</a><span class="k">def</span> <span class="nf">SEIRplusode</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span> 
+    <span class="c"># y0 = 3x1 numpy array of initial conditions.</span>
+    <span class="c"># time = Ntimestep length numpy array</span>
+    <span class="c"># beta = scalar</span>
+    <span class="c"># mu = scalar</span>
+    <span class="c"># gamma = scalar</span>
+    
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">rk4</span><span class="p">(</span><span class="n">SEIRplus_D</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">gamma</span><span class="p">,</span><span class="n">nu</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">w</span><span class="p">,))</span>
+    <span class="n">Xsim</span> <span class="o">=</span> <span class="n">Xsim</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Xsim</span>
+
+<span class="c"># Derivative for SEIR-plus system.</span></div>
+<div class="viewcode-block" id="SEIRplus_D"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.SEIRplus_D">[docs]</a><span class="k">def</span> <span class="nf">SEIRplus_D</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">gamma</span><span class="p">,</span><span class="n">nu</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">w</span><span class="p">):</span>
+    <span class="c"># y[0] = susceptible</span>
+    <span class="c"># y[1] = exposed</span>
+    <span class="c"># y[2] = infected/infectious</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    
+    <span class="n">dy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">trans_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">w</span><span class="p">))</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">nu</span><span class="p">)</span>
+    <span class="n">dy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">trans_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">w</span><span class="p">))</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">nu</span><span class="p">)</span> <span class="o">-</span> <span class="n">mu</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dy</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">mu</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">gamma</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dy</span>
+
+<span class="c">###############################################################################</span>
+<span class="c"># Time variable transmission function used in several of the above models.</span>
+<span class="c"># This varies over [beta*(1-alpha),beta*(1+alpha)]</span></div>
+<div class="viewcode-block" id="trans_rate"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.trans_rate">[docs]</a><span class="k">def</span> <span class="nf">trans_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">alpha</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">w</span><span class="p">):</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="c"># parameter controlling transition length</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="c"># parameter controlling smoothness</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">/</span><span class="n">w</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="n">c</span><span class="p">)</span><span class="o">/</span><span class="n">w</span><span class="p">),</span><span class="n">k</span><span class="p">)),</span><span class="n">m</span><span class="p">))</span> <span class="o">-</span> <span class="mf">1.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">rate</span><span class="p">))</span>
+
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c"># rk4-algorithm used in several of the above simulations.</span>
+<span class="c">#</span>
+<span class="c"># Integrate an ODE specified by </span>
+<span class="c"># y&#39; = f(y,t,args), y(t0) = y0, t0 &lt; t &lt; T</span>
+<span class="c"># Using fourth order Runge-Kutta on a specified time grid.</span>
+
+<span class="c"># f() must return a numpy column array of outputs of the same</span>
+<span class="c"># dimension as that of y. It must take a numpy column array of</span>
+<span class="c"># variable values y, a single float time t, and any other arguments.</span>
+
+<span class="c"># The output is a numpy array of y values at the times in t of</span>
+<span class="c"># dimensions (len(t),len(y0)).</span></div>
+<div class="viewcode-block" id="rk4"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.epiODElib.rk4">[docs]</a><span class="k">def</span> <span class="nf">rk4</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">()):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">y0</span><span class="p">)))</span>
+    <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">y0</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">yiter</span> <span class="o">=</span> <span class="n">y0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">k1</span> <span class="o">=</span> <span class="n">h</span><span class="o">*</span><span class="n">func</span><span class="p">(</span><span class="n">yiter</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">k2</span> <span class="o">=</span> <span class="n">h</span><span class="o">*</span><span class="n">func</span><span class="p">(</span><span class="n">yiter</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">k1</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">h</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">k3</span> <span class="o">=</span> <span class="n">h</span><span class="o">*</span><span class="n">func</span><span class="p">(</span><span class="n">yiter</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">k2</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="o">*</span><span class="n">h</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">k4</span> <span class="o">=</span> <span class="n">h</span><span class="o">*</span><span class="n">func</span><span class="p">(</span><span class="n">yiter</span> <span class="o">+</span> <span class="n">k3</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">h</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">yiter</span> <span class="o">=</span> <span class="n">yiter</span> <span class="o">+</span> <span class="mf">0.16666666</span><span class="o">*</span><span class="p">(</span><span class="n">k1</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">k2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">k3</span> <span class="o">+</span> <span class="n">k4</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">yiter</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">output</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Kyle Hickmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

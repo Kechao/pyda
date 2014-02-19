@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyda.utilities.AssimilationVis &mdash; pyda 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyda 1.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../../index.html"><img src="../../../_static/logo.png" border="0" alt="py4sci"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyda.utilities.AssimilationVis</h1><div class="highlight"><pre>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c">#   Copyright 2014 Kyle S. Hickmann and</span>
+<span class="c">#                  The Administrators of the Tulane Educational Fund</span>
+<span class="c">#</span>
+<span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c">#   you may not use this file except in compliance with the License.</span>
+<span class="c">#   You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#       http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c">#   See the License for the specific language governing permissions and</span>
+<span class="c">#   limitations under the License.</span>
+<span class="c">###############################################################################</span>
+<span class="c">###############################################################################</span>
+<span class="c"># Module of functions for different visualizations of a data</span>
+<span class="c"># assimilation process. </span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span> 
+
+<span class="c"># NOTE: This visualization assumes that the data being assimilated is</span>
+<span class="c"># a scalar.  Uses percentile (100.0*Quantile) cone visualization as</span>
+<span class="c"># opposed to trajectory visualization. This will provide a decent</span>
+<span class="c"># starting point for designing application specific visualizations for</span>
+<span class="c"># data assimilation with ODE systems.</span>
+<div class="viewcode-block" id="ode_DA_vis1"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.AssimilationVis.ode_DA_vis1">[docs]</a><span class="k">def</span> <span class="nf">ode_DA_vis1</span><span class="p">(</span><span class="n">SimDim</span><span class="p">,</span><span class="n">DataFileName</span><span class="p">,</span><span class="n">EnsembleFileName</span><span class="p">,</span><span class="n">AnalysisFileName</span><span class="p">):</span>
+    <span class="c"># First load respective files into NumPy arrays and set ensemble size</span>
+    <span class="n">DataArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">DataFileName</span><span class="p">,</span><span class="n">delimiter</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">Ndata_pts</span> <span class="o">=</span> <span class="n">DataArray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># Pull out data time</span>
+    <span class="n">datatime</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># Pull out data timeseries</span>
+    <span class="n">DataSeries</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c"># Define percentiles</span>
+    <span class="n">pLev</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">25.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">75.0</span><span class="p">,</span> <span class="mf">95.0</span><span class="p">]</span>
+
+    <span class="c"># Import analysis ensemble data</span>
+    <span class="n">AnalysisArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">AnalysisFileName</span><span class="p">)</span>
+
+    <span class="c"># Grab analysis time</span>
+    <span class="n">analysistime</span> <span class="o">=</span> <span class="n">AnalysisArray</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># Pull array of last simulation dimension of runs </span>
+    <span class="c"># NOTE: This should be fixed to either specify which simulation</span>
+    <span class="c"># dimension to graph or cycle through each simulation dimension</span>
+    <span class="c"># and create many subplots/plots.</span>
+    <span class="n">AnalysisSeries</span> <span class="o">=</span> <span class="n">AnalysisArray</span><span class="p">[:,</span><span class="n">SimDim</span><span class="p">::</span><span class="n">SimDim</span><span class="p">]</span>
+
+    <span class="c"># Import ensemble data</span>
+    <span class="n">EnsembleArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">EnsembleFileName</span><span class="p">)</span>
+
+    <span class="c"># Grab analysis time</span>
+    <span class="n">ensembletime</span> <span class="o">=</span> <span class="n">EnsembleArray</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># Pull array of last simulation dimension of runs</span>
+    <span class="c"># NOTE: This should be fixed to either specify which simulation</span>
+    <span class="c"># dimension to graph or cycle through each simulation dimension</span>
+    <span class="c"># and create many subplots/plots.</span>
+    <span class="n">EnsembleSeries</span> <span class="o">=</span> <span class="n">EnsembleArray</span><span class="p">[:,</span><span class="n">SimDim</span><span class="p">::</span><span class="n">SimDim</span><span class="p">]</span>
+
+    <span class="c"># Calculate ensemble percentile curves</span>
+    <span class="n">EnPcnt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">EnsembleSeries</span><span class="p">,</span><span class="n">pLev</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c"># Calculate analysis quantile curves</span>
+    <span class="n">AnPcnt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">AnalysisSeries</span><span class="p">,</span><span class="n">pLev</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c"># Only plot one group of analysis ensemble runs </span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c"># Plot 90% cone</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">ensembletime</span><span class="p">,</span><span class="n">EnPcnt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">EnPcnt</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                     <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">158.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">202.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">225.</span><span class="o">/</span><span class="mf">255.</span><span class="p">),</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="c"># Plot 50% cone</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">ensembletime</span><span class="p">,</span><span class="n">EnPcnt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">EnPcnt</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                     <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">49.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">130.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">189.</span><span class="o">/</span><span class="mf">255.</span><span class="p">),</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="c"># Plot median forecast</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ensembletime</span><span class="p">,</span><span class="n">EnPcnt</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="s">&#39;r-&#39;</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Median Forecast&#39;</span><span class="p">)</span>
+    <span class="c"># Plot data over ensemble plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">datatime</span><span class="p">,</span> <span class="n">DataSeries</span><span class="p">,</span> <span class="s">&#39;yD&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Data&#39;</span><span class="p">)</span>
+    <span class="c"># Label the plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&#39;ODE Data Assimilation (Ensemble)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Simulation&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Time&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span><span class="n">datatime</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="c"># Plot 90% cone</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">analysistime</span><span class="p">,</span><span class="n">AnPcnt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">AnPcnt</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+                     <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">158.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">202.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">225.</span><span class="o">/</span><span class="mf">255.</span><span class="p">),</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="c"># Plot 50% cone</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">analysistime</span><span class="p">,</span><span class="n">AnPcnt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">AnPcnt</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                     <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">49.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">130.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">189.</span><span class="o">/</span><span class="mf">255.</span><span class="p">),</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="c"># Plot median forecast</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">analysistime</span><span class="p">,</span><span class="n">AnPcnt</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="s">&#39;r-&#39;</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Median Forecast&#39;</span><span class="p">)</span>
+    <span class="c"># Plot data over ensemble plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">datatime</span><span class="p">,</span> <span class="n">DataSeries</span><span class="p">,</span> <span class="s">&#39;yD&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Data&#39;</span><span class="p">)</span>
+    <span class="c"># Label the plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&#39;ODE Data Assimilation (Analysis)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Simulation&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Time&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span><span class="n">datatime</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="c"># Display image</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c">######################################################################</span>
+<span class="c">######################################################################</span>
+
+<span class="c"># NOTE: This visualization assumes that the data being assimilated is</span>
+<span class="c"># a scalar.  Uses trajectory visualization. This will provide a decent</span>
+<span class="c"># starting point for designing application specific visualizations for</span>
+<span class="c"># data assimilation with ODE systems.</span></div>
+<div class="viewcode-block" id="ode_DA_vis2"><a class="viewcode-back" href="../../../documentation.html#pyda.utilities.AssimilationVis.ode_DA_vis2">[docs]</a><span class="k">def</span> <span class="nf">ode_DA_vis2</span><span class="p">(</span><span class="n">SimDim</span><span class="p">,</span><span class="n">DataFileName</span><span class="p">,</span><span class="n">EnsembleFileName</span><span class="p">,</span><span class="n">AnalysisFileName</span><span class="p">):</span>
+    <span class="c"># First load respective files into NumPy arrays and set ensemble size</span>
+    <span class="n">DataArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">DataFileName</span><span class="p">,</span><span class="n">delimiter</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">Ndata_pts</span> <span class="o">=</span> <span class="n">DataArray</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># Pull out data time</span>
+    <span class="n">datatime</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># Pull out data timeseries</span>
+    <span class="n">DataSeries</span> <span class="o">=</span> <span class="n">DataArray</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c"># Import analysis ensemble data</span>
+    <span class="n">AnalysisArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">AnalysisFileName</span><span class="p">)</span>
+
+    <span class="c"># Grab analysis time</span>
+    <span class="n">analysistime</span> <span class="o">=</span> <span class="n">AnalysisArray</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># Pull array of last simulation dimension of runs </span>
+    <span class="c"># NOTE: This should be fixed to either specify which simulation</span>
+    <span class="c"># dimension to graph or cycle through each simulation dimension</span>
+    <span class="c"># and create many subplots/plots.</span>
+    <span class="n">AnalysisSeries</span> <span class="o">=</span> <span class="n">AnalysisArray</span><span class="p">[:,</span><span class="n">SimDim</span><span class="p">::</span><span class="n">SimDim</span><span class="p">]</span>
+
+    <span class="c"># Import ensemble data</span>
+    <span class="n">EnsembleArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">EnsembleFileName</span><span class="p">)</span>
+
+    <span class="c"># Grab analysis time</span>
+    <span class="n">ensembletime</span> <span class="o">=</span> <span class="n">EnsembleArray</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c"># Pull array of last simulation dimension of runs</span>
+    <span class="c"># NOTE: This should be fixed to either specify which simulation</span>
+    <span class="c"># dimension to graph or cycle through each simulation dimension</span>
+    <span class="c"># and create many subplots/plots.</span>
+    <span class="n">EnsembleSeries</span> <span class="o">=</span> <span class="n">EnsembleArray</span><span class="p">[:,</span><span class="n">SimDim</span><span class="p">::</span><span class="n">SimDim</span><span class="p">]</span>
+
+    <span class="n">EnSize</span> <span class="o">=</span> <span class="n">EnsembleSeries</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">EnSize</span><span class="p">):</span>
+        <span class="c"># Light Blue: color=(36./255.,164./255.,239./255.)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ensembletime</span><span class="p">,</span><span class="n">EnsembleSeries</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">161.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">218.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">180.</span><span class="o">/</span><span class="mf">255.</span><span class="p">),</span><span class="n">linewidth</span><span class="o">=.</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">analysistime</span><span class="p">,</span><span class="n">AnalysisSeries</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">37.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">52.</span><span class="o">/</span><span class="mf">255.</span><span class="p">,</span><span class="mf">148.</span><span class="o">/</span><span class="mf">255.</span><span class="p">),</span><span class="n">linewidth</span><span class="o">=.</span><span class="mi">2</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">datatime</span><span class="p">,</span> <span class="n">DataSeries</span><span class="p">,</span> <span class="s">&#39;yD&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Data&#39;</span><span class="p">)</span>
+    <span class="c"># Label the plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&#39;ODE Data Assimilation&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Simulation&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Time&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span><span class="n">datatime</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+    <span class="c"># Display image</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c">######################################################################</span>
+<span class="c">######################################################################</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Kyle Hickmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

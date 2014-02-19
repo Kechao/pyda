@@ -1,0 +1,308 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Analysis Generator Template Class &mdash; pyda 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="pyda 1.0 documentation" href="index.html" />
+    <link rel="prev" title="Modules, Classes &amp; Functions" href="documentation-index.html" /> 
+  </head>
+  <body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><img src="static/logo.png" border="0" alt="py4sci"/></a>
+</div>
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="documentation-index.html" title="Modules, Classes &amp; Functions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Analysis Generator Template Class</a><ul>
+<li><a class="reference internal" href="#kalman-filters">Kalman Filters</a></li>
+<li><a class="reference internal" href="#particle-filters">Particle Filters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-assimilation-template-class">Data Assimilation Template Class</a><ul>
+<li><a class="reference internal" href="#data-assimilation-schemes">Data Assimilation Schemes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ensemble-generator-template-class">Ensemble Generator Template Class</a><ul>
+<li><a class="reference internal" href="#ensemble-generation-implementations">Ensemble Generation Implementations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#utilities">Utilities</a><ul>
+<li><a class="reference internal" href="#epidemic-models">Epidemic Models</a></li>
+<li><a class="reference internal" href="#assimilation-visualization">Assimilation Visualization</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="documentation-index.html"
+                        title="previous chapter">Modules, Classes &amp; Functions</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/documentation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="analysis-generator-template-class">
+<span id="analysis-generator-class"></span><h1>Analysis Generator Template Class<a class="headerlink" href="#analysis-generator-template-class" title="Permalink to this headline">¶</a></h1>
+<p>All analysis generation methods in pyda are derived from this class.</p>
+<dl class="class">
+<dt id="pyda.analysis_generator.analysis_generator_class.AnalysisGeneratorClass">
+<em class="property">class </em><tt class="descclassname">pyda.analysis_generator.analysis_generator_class.</tt><tt class="descname">AnalysisGeneratorClass</tt><a class="reference internal" href="modules/pyda/analysis_generator/analysis_generator_class.html#AnalysisGeneratorClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.analysis_generator.analysis_generator_class.AnalysisGeneratorClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="kalman-filters">
+<span id="id1"></span><h2>Kalman Filters<a class="headerlink" href="#kalman-filters" title="Permalink to this headline">¶</a></h2>
+<p>Different flavors of ensemble Kalman filters are available.</p>
+<span class="target" id="enkf"></span><dl class="class">
+<dt id="pyda.analysis_generator.kf.enkf1.ENKF1">
+<em class="property">class </em><tt class="descclassname">pyda.analysis_generator.kf.enkf1.</tt><tt class="descname">ENKF1</tt><a class="reference internal" href="modules/pyda/analysis_generator/kf/enkf1.html#ENKF1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.analysis_generator.kf.enkf1.ENKF1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="enkf-inflation"></span><dl class="class">
+<dt id="pyda.analysis_generator.kf.enkf1_inflation.ENKF1_inflation">
+<em class="property">class </em><tt class="descclassname">pyda.analysis_generator.kf.enkf1_inflation.</tt><tt class="descname">ENKF1_inflation</tt><big>(</big><em>rho=1.0</em><big>)</big><a class="reference internal" href="modules/pyda/analysis_generator/kf/enkf1_inflation.html#ENKF1_inflation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.analysis_generator.kf.enkf1_inflation.ENKF1_inflation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="particle-filters">
+<span id="id2"></span><h2>Particle Filters<a class="headerlink" href="#particle-filters" title="Permalink to this headline">¶</a></h2>
+<p>Different flavors of particle filters, sequential Monte Carlo filters, are available.</p>
+<span class="target" id="pf-naive"></span><dl class="class">
+<dt id="pyda.analysis_generator.pf.pf_naive.PF_NAIVE">
+<em class="property">class </em><tt class="descclassname">pyda.analysis_generator.pf.pf_naive.</tt><tt class="descname">PF_NAIVE</tt><a class="reference internal" href="modules/pyda/analysis_generator/pf/pf_naive.html#PF_NAIVE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.analysis_generator.pf.pf_naive.PF_NAIVE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="data-assimilation-template-class">
+<span id="assimilation-class"></span><h1>Data Assimilation Template Class<a class="headerlink" href="#data-assimilation-template-class" title="Permalink to this headline">¶</a></h1>
+<p>Data assimilation classes handle the interaction of ensemble
+generation and analysis generation. All data assimilation classes are
+derived from this class.</p>
+<dl class="class">
+<dt id="pyda.assimilation.data_assimilation_class.DataAssimilationClass">
+<em class="property">class </em><tt class="descclassname">pyda.assimilation.data_assimilation_class.</tt><tt class="descname">DataAssimilationClass</tt><big>(</big><em>DataFileName</em>, <em>data_noise</em>, <em>Horizon</em>, <em>EnSize</em>, <em>SimDim</em>, <em>EnsembleClass</em>, <em>AnalysisClass</em><big>)</big><a class="reference internal" href="modules/pyda/assimilation/data_assimilation_class.html#DataAssimilationClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.assimilation.data_assimilation_class.DataAssimilationClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="data-assimilation-schemes">
+<h2>Data Assimilation Schemes<a class="headerlink" href="#data-assimilation-schemes" title="Permalink to this headline">¶</a></h2>
+<p>pyda includes some preprogrammed data assimilation classes that inherit from <tt class="docutils literal"><span class="pre">DataAssimilationClass</span></tt></p>
+<span class="target" id="assimilation-current"></span><dl class="class">
+<dt id="pyda.assimilation.assimilation_current.DA_current">
+<em class="property">class </em><tt class="descclassname">pyda.assimilation.assimilation_current.</tt><tt class="descname">DA_current</tt><big>(</big><em>DataFileName</em>, <em>data_noise</em>, <em>Horizon</em>, <em>EnSize</em>, <em>SimDim</em>, <em>EnsembleClass</em>, <em>AnalysisClass</em><big>)</big><a class="reference internal" href="modules/pyda/assimilation/assimilation_current.html#DA_current"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.assimilation.assimilation_current.DA_current" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="assimilation-current2horizon"></span><dl class="class">
+<dt id="pyda.assimilation.assimilation_current2horizon.DA_current2horizon">
+<em class="property">class </em><tt class="descclassname">pyda.assimilation.assimilation_current2horizon.</tt><tt class="descname">DA_current2horizon</tt><big>(</big><em>DataFileName</em>, <em>data_noise</em>, <em>Horizon</em>, <em>EnSize</em>, <em>SimDim</em>, <em>EnsembleClass</em>, <em>AnalysisClass</em><big>)</big><a class="reference internal" href="modules/pyda/assimilation/assimilation_current2horizon.html#DA_current2horizon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.assimilation.assimilation_current2horizon.DA_current2horizon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="assimilation-smoother"></span><dl class="class">
+<dt id="pyda.assimilation.assimilation_smoother.DA_smoother">
+<em class="property">class </em><tt class="descclassname">pyda.assimilation.assimilation_smoother.</tt><tt class="descname">DA_smoother</tt><big>(</big><em>DataFileName</em>, <em>data_noise</em>, <em>data_lag</em>, <em>Horizon</em>, <em>EnSize</em>, <em>SimDim</em>, <em>EnsembleClass</em>, <em>AnalysisClass</em><big>)</big><a class="reference internal" href="modules/pyda/assimilation/assimilation_smoother.html#DA_smoother"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.assimilation.assimilation_smoother.DA_smoother" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="ensemble-generator-template-class">
+<span id="ensemble-class"></span><h1>Ensemble Generator Template Class<a class="headerlink" href="#ensemble-generator-template-class" title="Permalink to this headline">¶</a></h1>
+<p>pyda uses a class to call the simulation for forward propagation. This
+serves as a template to implement your own.</p>
+<dl class="class">
+<dt id="pyda.ensemble_generator.ensemble_generator_class.EnsembleGeneratorClass">
+<em class="property">class </em><tt class="descclassname">pyda.ensemble_generator.ensemble_generator_class.</tt><tt class="descname">EnsembleGeneratorClass</tt><a class="reference internal" href="modules/pyda/ensemble_generator/ensemble_generator_class.html#EnsembleGeneratorClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.ensemble_generator.ensemble_generator_class.EnsembleGeneratorClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="section" id="ensemble-generation-implementations">
+<h2>Ensemble Generation Implementations<a class="headerlink" href="#ensemble-generation-implementations" title="Permalink to this headline">¶</a></h2>
+<p>pyda has one ensemble propagation class built currently. This should
+provide a good example for implementing your own ODE data assimilation
+example. For higher dimensions the data storage will be more
+difficult. Stay tuned!</p>
+<span class="target" id="ensemble-sir"></span><dl class="class">
+<dt id="pyda.ensemble_generator.SIRensemble.SIRensemble">
+<em class="property">class </em><tt class="descclassname">pyda.ensemble_generator.SIRensemble.</tt><tt class="descname">SIRensemble</tt><a class="reference internal" href="modules/pyda/ensemble_generator/SIRensemble.html#SIRensemble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.ensemble_generator.SIRensemble.SIRensemble" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+<div class="section" id="utilities">
+<span id="id3"></span><h1>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="epidemic-models">
+<span id="epi-models"></span><h2>Epidemic Models<a class="headerlink" href="#epidemic-models" title="Permalink to this headline">¶</a></h2>
+<p>We have included a number of ODE epidemic model implementations for
+data assimilation experimentation. It remains to include 2-dimensional
+examples.</p>
+<p>All of the ODE models are simulated using a fourth order Runge-Kutta
+scheme which provides an accurate enough solution for experimentation
+with the epidemic models.</p>
+<p>The epidemic models call the <tt class="docutils literal"><span class="pre">rk4</span></tt> function through a model function
+that passes a derivative of the system along with the
+parametrization/initialization. The majority of the model
+specification takes place in the derivative term.</p>
+<span class="target" id="util-rk4"></span><dl class="function">
+<dt id="pyda.utilities.epiODElib.rk4">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">rk4</tt><big>(</big><em>func</em>, <em>y0</em>, <em>t</em>, <em>args=()</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#rk4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.rk4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p id="util-trans">A few of the epi-models use a variable transmission which is
+implemented as a function.</p>
+<dl class="function">
+<dt id="pyda.utilities.epiODElib.trans_rate">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">trans_rate</tt><big>(</big><em>t</em>, <em>beta</em>, <em>alpha</em>, <em>c</em>, <em>w</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#trans_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.trans_rate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Now for the actual models...</p>
+<span class="target" id="util-sir"></span><dl class="function">
+<dt id="pyda.utilities.epiODElib.SIRode">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SIRode</tt><big>(</big><em>y0</em>, <em>time</em>, <em>beta</em>, <em>gamma</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SIRode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SIRode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyda.utilities.epiODElib.SIR_D">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SIR_D</tt><big>(</big><em>y</em>, <em>t</em>, <em>beta</em>, <em>gamma</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SIR_D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SIR_D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="util-sirmod1ode"></span><dl class="function">
+<dt id="pyda.utilities.epiODElib.SIRmod1ode">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SIRmod1ode</tt><big>(</big><em>y0</em>, <em>time</em>, <em>beta</em>, <em>gamma</em>, <em>nu</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SIRmod1ode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SIRmod1ode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyda.utilities.epiODElib.SIRmod1_D">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SIRmod1_D</tt><big>(</big><em>y</em>, <em>t</em>, <em>beta</em>, <em>gamma</em>, <em>nu</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SIRmod1_D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SIRmod1_D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="util-sirmod2ode"></span><dl class="function">
+<dt id="pyda.utilities.epiODElib.SIRmod2ode">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SIRmod2ode</tt><big>(</big><em>y0</em>, <em>time</em>, <em>beta</em>, <em>gamma</em>, <em>nu</em>, <em>alpha</em>, <em>c</em>, <em>w</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SIRmod2ode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SIRmod2ode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyda.utilities.epiODElib.SIRmod2_D">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SIRmod2_D</tt><big>(</big><em>y</em>, <em>t</em>, <em>beta</em>, <em>gamma</em>, <em>nu</em>, <em>alpha</em>, <em>c</em>, <em>w</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SIRmod2_D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SIRmod2_D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="util-seirode"></span><dl class="function">
+<dt id="pyda.utilities.epiODElib.SEIRode">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SEIRode</tt><big>(</big><em>y0</em>, <em>time</em>, <em>beta</em>, <em>mu</em>, <em>gamma</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SEIRode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SEIRode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyda.utilities.epiODElib.SEIR_D">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SEIR_D</tt><big>(</big><em>y</em>, <em>t</em>, <em>beta</em>, <em>mu</em>, <em>gamma</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SEIR_D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SEIR_D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="util-seirplusode"></span><dl class="function">
+<dt id="pyda.utilities.epiODElib.SEIRplusode">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SEIRplusode</tt><big>(</big><em>y0</em>, <em>time</em>, <em>beta</em>, <em>mu</em>, <em>gamma</em>, <em>nu</em>, <em>alpha</em>, <em>c</em>, <em>w</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SEIRplusode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SEIRplusode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyda.utilities.epiODElib.SEIRplus_D">
+<tt class="descclassname">pyda.utilities.epiODElib.</tt><tt class="descname">SEIRplus_D</tt><big>(</big><em>y</em>, <em>t</em>, <em>beta</em>, <em>mu</em>, <em>gamma</em>, <em>nu</em>, <em>alpha</em>, <em>c</em>, <em>w</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/epiODElib.html#SEIRplus_D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.epiODElib.SEIRplus_D" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="assimilation-visualization">
+<span id="visualization"></span><h2>Assimilation Visualization<a class="headerlink" href="#assimilation-visualization" title="Permalink to this headline">¶</a></h2>
+<p>We provide two functions so far to visualize the data assimilation
+process for ODE.</p>
+<span class="target" id="vis1"></span><dl class="function">
+<dt id="pyda.utilities.AssimilationVis.ode_DA_vis1">
+<tt class="descclassname">pyda.utilities.AssimilationVis.</tt><tt class="descname">ode_DA_vis1</tt><big>(</big><em>SimDim</em>, <em>DataFileName</em>, <em>EnsembleFileName</em>, <em>AnalysisFileName</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/AssimilationVis.html#ode_DA_vis1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.AssimilationVis.ode_DA_vis1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="vis2"></span><dl class="function">
+<dt id="pyda.utilities.AssimilationVis.ode_DA_vis2">
+<tt class="descclassname">pyda.utilities.AssimilationVis.</tt><tt class="descname">ode_DA_vis2</tt><big>(</big><em>SimDim</em>, <em>DataFileName</em>, <em>EnsembleFileName</em>, <em>AnalysisFileName</em><big>)</big><a class="reference internal" href="modules/pyda/utilities/AssimilationVis.html#ode_DA_vis2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyda.utilities.AssimilationVis.ode_DA_vis2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="documentation-index.html" title="Modules, Classes &amp; Functions"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Kyle Hickmann.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>
